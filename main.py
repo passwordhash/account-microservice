@@ -2,7 +2,7 @@ import logging
 from dotenv import load_dotenv
 
 
-from src.api.grpc import create_server
+from src.api.grpc_server import create_server
 
 logging.basicConfig(level=logging.INFO, filemode="w",
                     format="%(asctime)s %(levelname)s %(message)s")

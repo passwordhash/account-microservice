@@ -56,3 +56,7 @@ class AccountRepository:
 
     def find_by_uuid(self, uuid: str):
         return self.db_session.query(AccountModel).get(uuid)
+
+    def find_by_email(self, email):
+        with self.db_session as session:
+            return session.query(AccountModel).filter(AccountModel.email == email).first()

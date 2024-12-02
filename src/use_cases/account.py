@@ -6,7 +6,7 @@ from typing import Tuple
 import jwt
 from uuid import uuid4
 
-from src.core.account import Account, AccountCreate
+from src.core.account import Account, AccountCreate, AccountLogin
 from src.core.config import Config
 from src.core.consts import DEFAULT_JWT_EXPIRES_IN, JWT_TOKEN_ALG
 from src.core.converter import account_to_pb
@@ -30,7 +30,8 @@ class AccountUseCase:
         uuid = str(uuid4())
         hashed_password = self.hash(req.password)
 
-        candidate = Account(uuid=uuid, email=req.email, hashed_password=hashed_password)
+        candidate = Account(uuid=uuid, email=req.email,
+                            hashed_password=hashed_password)
 
         uuid = self.account_repository.save(candidate)
 
@@ -38,21 +39,37 @@ class AccountUseCase:
 
         return uuid, jwt_token
 
+    def login(self, req: AccountLogin) -> str:
+        """Аутентификация пользователя. Возвращает JWT Token"""
+        # TODO: decrypt password
+
+        account = self.account_repository.find_by_email(req.email)
+        if not account:
+            raise ValueError("Account not found")
+
+        if self.hash(req.encrypted_password) != account.hashed_password:
+            raise ValueError("Invalid password")
+
+        return self._create_jwt_token(account.uuid)
+
     @staticmethod
-    def _create_jwt_token(uuid: str, expires_in: int = DEFAULT_JWT_EXPIRES_IN) -> str:
+    def _create_jwt_token(uuid: str,
+                          expires_in: int = DEFAULT_JWT_EXPIRES_IN) -> str:
         """Создание JWT токена."""
         payload = {"uuid": uuid,
                    "exp": datetime.utcnow() + timedelta(minutes=expires_in),
                    "iat": datetime.utcnow()
-        }
-        token = jwt.encode(payload, Config.JWT_SECRET.value, algorithm=JWT_TOKEN_ALG)
+                   }
+        token = jwt.encode(payload, Config.JWT_SECRET.value,
+                           algorithm=JWT_TOKEN_ALG)
         return token
 
     @staticmethod
     def _decode_jwt_token(token: str) -> str:
         """Декодирование JWT токена."""
         try:
-            payload = jwt.decode(token, Config.JWT_SECRET.value, algorithms=[JWT_TOKEN_ALG])
+            payload = jwt.decode(token, Config.JWT_SECRET.value,
+                                 algorithms=[JWT_TOKEN_ALG])
             return payload["uuid"]
         except jwt.ExpiredSignatureError:
             raise ValueError("Token has expired")

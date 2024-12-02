@@ -16,3 +16,8 @@ class Account:
 class AccountCreate:
     email: str
     password: str
+
+@dataclass
+class AccountLogin:
+    email: str
+    encrypted_password: str
