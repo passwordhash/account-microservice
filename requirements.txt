@@ -1,0 +1,6 @@
+grpcio
+grpcio-tools
+sqlalchemy~=2.0.36
+dataclasses~=0.6
+google~=3.0.0
+psycopg2
