@@ -16,8 +16,3 @@ class Account:
 class AccountCreate:
     email: str
     password: str
-
-
-@dataclass
-class JWTTokenPayload:
-    uuid: str

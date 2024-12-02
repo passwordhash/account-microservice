@@ -34,5 +34,4 @@ class AccountService(grpc.AccountServiceServicer):
         return pb.GetAllResponse(accounts=accounts)
 
     def Get(self, request, context):
-        """TEST MODE"""
-        return pb.GetResponse(account=pb.Account(email="test", hashed_password="test"))
+        pass
