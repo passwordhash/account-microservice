@@ -1,7 +1,14 @@
 import logging
+from dataclasses import asdict
+from datetime import timedelta, datetime
+from typing import Tuple
+
+import jwt
 from uuid import uuid4
 
-from src.core.account import Account, AccountCreate
+from src.core.account import Account, AccountCreate, JWTTokenPayload
+from src.core.config import Config
+from src.core.consts import DEFAULT_JWT_EXPIRES_IN
 from src.core.converter import account_to_pb
 from src.infrastructure.account.repository import AccountRepository
 
@@ -18,8 +25,8 @@ class AccountUseCase:
         pb_accounts = list(map(lambda x: account_to_pb(x), db_accounts))
         return pb_accounts
 
-    def register(self, req: AccountCreate) -> str:
-        """Регистрация аккаунта. Возвращает uuid созданного аккаунта."""
+    def register(self, req: AccountCreate) -> tuple[str, str]:
+        """Регистрация аккаунта. Возвращает JWT Token"""
         uuid = str(uuid4())
         hashed_password = self.hash(req.password)
 
@@ -27,7 +34,20 @@ class AccountUseCase:
 
         uuid = self.account_repository.save(candidate)
 
-        return uuid
+        jwt_token = self._create_jwt_token(JWTTokenPayload(
+            uuid=uuid
+        ))
+
+        return uuid, jwt_token
+
+    @staticmethod
+    def _create_jwt_token(data: JWTTokenPayload, expires_in: int = DEFAULT_JWT_EXPIRES_IN) -> str:
+        """Создание JWT токена."""
+        payload = asdict(data)
+        payload["exp"] = datetime.utcnow() + timedelta(minutes=expires_in)
+        payload["iat"] = datetime.utcnow()
+        token = jwt.encode(payload, Config.JWT_SECRET.value, algorithm=Config.JWT_ALGORITHM.value)
+        return token
 
     @staticmethod
     def hash(password):

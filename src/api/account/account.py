@@ -22,11 +22,11 @@ class AccountService(grpc.AccountServiceServicer):
             context.set_details("password is required")
             return pb.CreateResponse()
 
-        uuid = self.account_use_case.register(
+        uuid, token = self.account_use_case.register(
             AccountCreate(email=request.email, password=request.encrypted_password)
         )
 
-        return pb.CreateResponse(uuid=uuid, jwt_token="-")
+        return pb.CreateResponse(uuid=uuid, jwt_token=token)
 
     def GetAll(self, request, context):
         accounts = self.account_use_case.get_all()

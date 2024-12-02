@@ -8,7 +8,7 @@ from src.core.config import Config
 DEFAULT_POSTGRES_DATABASE_URL = ("postgresql://postgres:password@localhost:5432"
                                  "/account-service")
 
-engine = create_engine(Config.POSTGRES_DB_URL | DEFAULT_POSTGRES_DATABASE_URL)
+engine = create_engine(Config.POSTGRES_DB_URL.value)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
