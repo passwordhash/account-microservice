@@ -3,13 +3,12 @@ import logging
 from sqlalchemy import create_engine, Engine, text
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.infrastructure"
-# TODO: move to .env
-POSTGRES_DATABASE_URL = ("postgresql://postgres:password@localhost:5432"
-                         "/account-service")
+from src.core.config import Config
 
-engine = create_engine(POSTGRES_DATABASE_URL)
-# engine = create_engine(POSTGRES_DATABASE_URL, connect_args={"check_same_thread": False})
+DEFAULT_POSTGRES_DATABASE_URL = ("postgresql://postgres:password@localhost:5432"
+                                 "/account-service")
+
+engine = create_engine(Config.POSTGRES_DB_URL | DEFAULT_POSTGRES_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
