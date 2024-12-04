@@ -2,7 +2,7 @@ import logging
 from concurrent import futures
 import grpc as grpc_mod
 
-from src.api.account.account import AccountService
+from src.api.account.grpc_service import AccountService
 from src.infrastructure.database import init_db
 from src.interfaces.grpc import account_pb2_grpc as grpc
 

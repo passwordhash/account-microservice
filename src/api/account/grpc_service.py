@@ -7,7 +7,7 @@ from src.core.consts import DEFAULT_JWT_EXPIRES_IN
 from src.infrastructure.account.repository import AccountRepository
 from src.infrastructure.database import SessionLocal
 from src.interfaces.grpc import account_pb2 as pb, account_pb2_grpc as grpc
-from src.use_cases.account import AccountUseCase
+from src.use_cases.account.use_case import AccountUseCase
 
 
 class AccountService(grpc.AccountServiceServicer):
