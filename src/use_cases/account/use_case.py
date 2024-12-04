@@ -1,7 +1,6 @@
 import logging
-from dataclasses import asdict
 from datetime import timedelta, datetime
-from typing import Tuple
+from bcrypt import hashpw, gensalt, checkpw
 
 import jwt
 from uuid import uuid4
@@ -16,8 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class AccountUseCase:
-    def __init__(self, account_repository: AccountRepository):
+    def __init__(self, account_repository: AccountRepository, jwt_secret: str,
+                 jwt_expires_in: int):
         self.account_repository = account_repository
+        self.jwt_secret = jwt_secret
+        self.jwt_expires_in = jwt_expires_in
 
     def get_all(self):
         """Возвращает список всех аккаунтов в виде списка pb.Account."""
@@ -45,9 +47,12 @@ class AccountUseCase:
 
         account = self.account_repository.find_by_email(req.email)
         if not account:
-            raise ValueError("Account not found")
+            pass
+            # TODO:
+            # raise
 
-        if self.hash(req.encrypted_password) != account.hashed_password:
+        if not self.verify_password(req.encrypted_password,
+                                    account.hashed_password):
             raise ValueError("Invalid password")
 
         return self._create_jwt_token(account.uuid)
@@ -77,8 +82,9 @@ class AccountUseCase:
             raise ValueError("Invalid token")
 
     @staticmethod
-    def hash(password):
-        """Хеширование пароля."""
-        import hashlib
-        # TODO: add secret
-        return hashlib.sha256(password.encode()).hexdigest()
+    def hash(password: str) -> str:
+        return hashpw(password.encode(), gensalt()).decode()
+
+    @staticmethod
+    def verify_password(password: str, hashed_password: str) -> bool:
+        return checkpw(password.encode(), hashed_password.encode())
