@@ -1,12 +1,13 @@
+from typing import Optional, List
+
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session
 from src.core.account import Account
+from src.infrastructure.account.converter import model_to_domain, \
+    domain_to_model
 from src.infrastructure.account.model import AccountModel
 from src.infrastructure.database import SessionLocal
-
-
-class AccountSaveError(Exception):
-    pass
+from src.infrastructure.exceptions import DuplicateEmailError, RepositoryError
 
 
 class AccountRepository:
@@ -14,49 +15,46 @@ class AccountRepository:
         self.db_session = db_session or SessionLocal()
 
     def save(self, account: Account) -> str:
-        db_account = AccountModel(
-            email=account.email,
-            hashed_password=account.hashed_password
-        )
-
+        model = domain_to_model(account)
         with self.db_session as session:
             try:
-                session.add(db_account)
+                session.add(model)
                 session.commit()
-                session.refresh(db_account)
-                return db_account.uuid
+                return model.uuid
             except IntegrityError as e:
-                session.rollback()
-                raise AccountSaveError(
+                raise DuplicateEmailError(
                     "Аккаунт с таким email уже существует.") from e
             except SQLAlchemyError as e:
-                session.rollback()
-                raise AccountSaveError(
+                raise RepositoryError(
                     "Произошла ошибка при сохранении аккаунта.") from e
 
-        return db_account.uuid
+    def get_all(self) -> List[Account]:
+        try:
+            with self.db_session as session:
+                return [model_to_domain(model) for model in
+                        session.query(AccountModel).all()]
+        except SQLAlchemyError as e:
+            raise RepositoryError(
+                "Ошибка при получении всех аккаунтов.") from e
 
-    def get_all(self):
+    def find_by_uuid(self, uuid: str) -> Optional[Account]:
         with self.db_session as session:
-            accounts_data = session.query(AccountModel).all()
-            accounts = [
-                Account(
-                    uuid=account.uuid,
-                    email=account.email,
-                    hashed_password=account.hashed_password,
-                    is_verified=account.is_verified,
-                    created_at=account.created_at
-                )
-                for account in accounts_data
-            ]
-            return accounts
+            try:
+                model = session.get(AccountModel, uuid)
+                if model is None:
+                    return None
+                return model_to_domain(model)
+            except SQLAlchemyError as e:
+                raise RepositoryError(
+                    f"Ошибка при поиске аккаунта с UUID {uuid}.") from e
 
-    # def find_by_email(self, email: str):
-    #     return self.db_session.query(AccountModel).filter(AccountModel.email == email).first()
-
-    def find_by_uuid(self, uuid: str):
-        return self.db_session.query(AccountModel).get(uuid)
-
-    def find_by_email(self, email):
+    def find_by_email(self, email: str) -> Optional[Account]:
         with self.db_session as session:
-            return session.query(AccountModel).filter(AccountModel.email == email).first()
+            try:
+                model = session.get(AccountModel, email)
+                if model is None:
+                    return None
+                return model_to_domain(model)
+            except SQLAlchemyError as e:
+                raise RepositoryError(
+                    f"Ошибка при поиске аккаунта с Email {email}.") from e

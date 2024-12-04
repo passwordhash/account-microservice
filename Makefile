@@ -1,4 +1,4 @@
-PROTO_DIR = ./proto
+PROTO_DIR = ./proto/account_v1
 OUT_DIR = ./src/interfaces/grpc
 PROTOC = python3 -m grpc_tools.protoc
 
