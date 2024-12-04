@@ -1,13 +1,11 @@
 class RepositoryError(Exception):
-    """Базовое исключение для ошибок репозитория."""
+    """Базовое исключение для ошибок репозитория"""
     pass
 
 
-class DuplicateEmailError(RepositoryError):
-    """Исключение при попытке добавить дублирующийся email."""
+class DuplicateError(RepositoryError):
     pass
 
 
 class DatabaseSaveError(RepositoryError):
-    """Исключение при ошибке сохранения в базу данных."""
     pass

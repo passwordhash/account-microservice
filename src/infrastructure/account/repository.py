@@ -1,6 +1,5 @@
 from typing import Optional, List
 
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session
 
 from src.core.account import Account
@@ -9,7 +8,6 @@ from src.infrastructure.account.converter import model_to_domain, \
 from src.infrastructure.account.model import AccountModel
 from src.infrastructure.database import SessionLocal
 from src.infrastructure.decorators import handle_session_errors
-from src.infrastructure.exceptions import DuplicateEmailError, RepositoryError
 
 
 class AccountRepository:
@@ -23,14 +21,10 @@ class AccountRepository:
         session.commit()
         return model.uuid
 
-    def get_all(self) -> List[Account]:
-        try:
-            with self.db_session as session:
-                return [model_to_domain(model) for model in
-                        session.query(AccountModel).all()]
-        except SQLAlchemyError as e:
-            raise RepositoryError(
-                "Ошибка при получении всех аккаунтов.") from e
+    @handle_session_errors
+    def get_all(self, session) -> List[Account]:
+        return [model_to_domain(model) for model in
+                session.query(AccountModel).all()]
 
     @handle_session_errors
     def find_by_uuid(self, session, uuid: str) -> Optional[Account]:

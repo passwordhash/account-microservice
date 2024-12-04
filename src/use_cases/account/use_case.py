@@ -1,15 +1,19 @@
 import logging
 from datetime import timedelta, datetime
-from bcrypt import hashpw, gensalt, checkpw
+from uuid import uuid4
 
 import jwt
-from uuid import uuid4
+from bcrypt import checkpw, hashpw, gensalt
 
 from src.core.account import Account, AccountCreate, AccountLogin
 from src.core.config import Config
 from src.core.consts import DEFAULT_JWT_EXPIRES_IN, JWT_TOKEN_ALG
-from src.core.converter import account_to_pb
 from src.infrastructure.account.repository import AccountRepository
+from src.infrastructure.exceptions import RepositoryError, DuplicateError
+from src.use_cases.account.converter import account_to_pb
+from src.use_cases.exceptions import AccountError, EmailConflictError, \
+    AccountNotFoundError, InvalidPasswordError, TokenExpiredError, \
+    InvalidTokenError
 
 logger = logging.getLogger(__name__)
 
@@ -23,39 +27,62 @@ class AccountUseCase:
 
     def get_all(self):
         """Возвращает список всех аккаунтов в виде списка pb.Account."""
-        db_accounts = self.account_repository.get_all()
-        pb_accounts = list(map(lambda x: account_to_pb(x), db_accounts))
-        return pb_accounts
+        try:
+            db_accounts = self.account_repository.get_all()
+            pb_accounts = list(map(lambda x: account_to_pb(x), db_accounts))
+            return pb_accounts
+        except (RepositoryError, Exception) as e:
+            logger.error(f"Error while getting all accounts: {e}")
+            raise AccountError("Error while getting all accounts") from e
 
     def register(self, req: AccountCreate) -> tuple[str, str]:
-        """Регистрация аккаунта. Возвращает JWT Token"""
-        uuid = str(uuid4())
-        hashed_password = self.hash(req.password)
+        """
+        Регистрация аккаунта. Возвращает UUID и JWT Token.
+        """
+        try:
+            uuid = str(uuid4())
+            hashed_password = self._hash(req.password)
 
-        candidate = Account(uuid=uuid, email=req.email,
-                            hashed_password=hashed_password)
+            candidate = Account(uuid=uuid, email=req.email,
+                                hashed_password=hashed_password)
+            uuid = self.account_repository.save(candidate)
 
-        uuid = self.account_repository.save(candidate)
+            jwt_token = self._create_jwt_token(uuid)
 
-        jwt_token = self._create_jwt_token(uuid)
-
-        return uuid, jwt_token
+            logger.info(f"Account registered: {req.email}")
+            return uuid, jwt_token
+        except DuplicateError as e:
+            logger.warning(
+                f"Attempt to register account with duplicate email: {str(e)}")
+            raise EmailConflictError(f"Account with email {req.email} already "
+                                     f"exists.") from e
+        except (RepositoryError, Exception) as e:
+            logger.error(
+                f"Error while registering account: {str(e)}")
+            raise AccountError("Error while registering account") from e
 
     def login(self, req: AccountLogin) -> str:
-        """Аутентификация пользователя. Возвращает JWT Token"""
-        # TODO: decrypt password
+        """Аутентификация пользователя. Возвращает JWT Token."""
+        try:
+            account = self.account_repository.find_by_email(req.email)
+            if not account:
+                logger.warning(f"Account with email {req.email} not found.")
+                raise AccountNotFoundError("Account not found.")
 
-        account = self.account_repository.find_by_email(req.email)
-        if not account:
-            pass
-            # TODO:
-            # raise
+            if not self._verify_password(req.encrypted_password,
+                                         account.hashed_password):
+                logger.warning(
+                    f"Incorrect password for account with email {req.email}")
+                raise InvalidPasswordError("Invalid password.")
 
-        if not self.verify_password(req.encrypted_password,
-                                    account.hashed_password):
-            raise ValueError("Invalid password")
-
-        return self._create_jwt_token(account.uuid)
+            jwt_token = self._create_jwt_token(account.uuid)
+            logger.info(f"Account logged in: {req.email}")
+            return jwt_token
+        except (AccountNotFoundError, InvalidPasswordError) as e:
+            raise e
+        except Exception as e:
+            logger.error(f"Error while logging in: {str(e)}")
+            raise AccountError("Error while logging in.") from e
 
     @staticmethod
     def _create_jwt_token(uuid: str,
@@ -76,15 +103,15 @@ class AccountUseCase:
             payload = jwt.decode(token, Config.JWT_SECRET.value,
                                  algorithms=[JWT_TOKEN_ALG])
             return payload["uuid"]
-        except jwt.ExpiredSignatureError:
-            raise ValueError("Token has expired")
-        except jwt.InvalidTokenError:
-            raise ValueError("Invalid token")
+        except jwt.ExpiredSignatureError as e:
+            raise TokenExpiredError("Token expired") from e
+        except jwt.InvalidTokenError as e:
+            raise InvalidTokenError("Invalid token") from e
 
     @staticmethod
-    def hash(password: str) -> str:
+    def _hash(password: str) -> str:
         return hashpw(password.encode(), gensalt()).decode()
 
     @staticmethod
-    def verify_password(password: str, hashed_password: str) -> bool:
+    def _verify_password(password: str, hashed_password: str) -> bool:
         return checkpw(password.encode(), hashed_password.encode())
