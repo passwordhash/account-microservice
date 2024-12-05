@@ -25,16 +25,6 @@ class AccountUseCase:
         self.jwt_secret = jwt_secret
         self.jwt_expires_in = jwt_expires_in
 
-    def get_all(self):
-        """Возвращает список всех аккаунтов в виде списка pb.Account."""
-        try:
-            db_accounts = self.account_repository.get_all()
-            pb_accounts = list(map(lambda x: account_to_pb(x), db_accounts))
-            return pb_accounts
-        except (RepositoryError, Exception) as e:
-            logger.error(f"Error while getting all accounts: {e}")
-            raise AccountError("Error while getting all accounts") from e
-
     def register(self, req: AccountCreate) -> tuple[str, str]:
         """
         Регистрация аккаунта. Возвращает UUID и JWT Token.
@@ -83,6 +73,16 @@ class AccountUseCase:
         except Exception as e:
             logger.error(f"Error while logging in: {str(e)}")
             raise AccountError("Error while logging in.") from e
+
+    def get_all(self):
+        """Возвращает список всех аккаунтов в виде списка pb.Account."""
+        try:
+            db_accounts = self.account_repository.get_all()
+            pb_accounts = list(map(lambda x: account_to_pb(x), db_accounts))
+            return pb_accounts
+        except (RepositoryError, Exception) as e:
+            logger.error(f"Error while getting all accounts: {e}")
+            raise AccountError("Error while getting all accounts") from e
 
     @staticmethod
     def _create_jwt_token(uuid: str,
