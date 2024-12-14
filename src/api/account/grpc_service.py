@@ -1,3 +1,5 @@
+import logging
+
 import grpc as grpc_mod
 
 from src.core.account import AccountCreate, AccountLogin
@@ -10,6 +12,7 @@ from src.api.account.responses import Responses, response, handle_error
 from src.use_cases.account.use_case import AccountUseCase
 from src.use_cases.exceptions import EmailConflictError, AccountNotFoundError
 
+logger = logging.getLogger(__name__)
 
 class AccountService(grpc.AccountServiceServicer):
     def __init__(self):
@@ -39,9 +42,11 @@ class AccountService(grpc.AccountServiceServicer):
             response(context, grpc_mod.StatusCode.OK, Responses.CREATE_OK)
             return pb.CreateResponse(uuid=uuid, jwt_token=token)
         except EmailConflictError as e:
+            logger.warning(f"Attempt to register account with duplicate email: {str(e)}")
             response(context, grpc_mod.StatusCode.ALREADY_EXISTS, str(e))
-            return pb.CreateResponse
+            return pb.CreateResponse()
         except Exception as e:
+            logger.error(f"Error while registering account: {str(e)}")
             handle_error(context, e, Responses.CREATE_ERROR)
             return pb.CreateResponse()
 

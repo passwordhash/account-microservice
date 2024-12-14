@@ -42,13 +42,13 @@ class AccountUseCase:
             logger.info(f"Account registered: {req.email}")
             return uuid, jwt_token
         except DuplicateError as e:
-            logger.warning(
-                f"Attempt to register account with duplicate email: {str(e)}")
+            # logger.warning(
+            #     f"Attempt to register account with duplicate email: {str(e)}")
             raise EmailConflictError(f"Account with email {req.email} already "
                                      f"exists.") from e
         except (RepositoryError, Exception) as e:
-            logger.error(
-                f"Error while registering account: {str(e)}")
+            # logger.error(
+            #     f"Error while registering account: {str(e)}")
             raise AccountError("Error while registering account") from e
 
     def login(self, req: AccountLogin) -> str:
