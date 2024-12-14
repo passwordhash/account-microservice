@@ -6,7 +6,7 @@ import jwt
 from bcrypt import checkpw, hashpw, gensalt
 
 from src.core.account import Account, AccountCreate, AccountLogin
-from src.core.config import Config
+from src.core.config import Config, config
 from src.core.consts import DEFAULT_JWT_EXPIRES_IN, JWT_TOKEN_ALG
 from src.infrastructure.account.repository import AccountRepository
 from src.infrastructure.exceptions import RepositoryError, DuplicateError
@@ -92,7 +92,7 @@ class AccountUseCase:
                    "exp": datetime.utcnow() + timedelta(minutes=expires_in),
                    "iat": datetime.utcnow()
                    }
-        token = jwt.encode(payload, Config.JWT_SECRET.value,
+        token = jwt.encode(payload, config.JWT_TOKEN_SECRET,
                            algorithm=JWT_TOKEN_ALG)
         return token
 
@@ -100,7 +100,7 @@ class AccountUseCase:
     def _decode_jwt_token(token: str) -> str:
         """Декодирование JWT токена."""
         try:
-            payload = jwt.decode(token, Config.JWT_SECRET.value,
+            payload = jwt.decode(token, config.JWT_TOKEN_SECRET,
                                  algorithms=[JWT_TOKEN_ALG])
             return payload["uuid"]
         except jwt.ExpiredSignatureError as e:
