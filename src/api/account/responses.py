@@ -10,8 +10,8 @@ def response(context, code: grpc_mod.StatusCode, message: str):
     context.set_details(message)
 
 
-def handle_error(context, error, message="An error occurred"):
-    logger.error(f"{message}: {str(error)}")
+def handle_error(context, error: Exception, message="An error occurred"):
+    logger.error(f"{message}: {str(error.__context__)}")
     if isinstance(error, grpc_mod.RpcError):
         response(context, error.code(), error.details())
     else:
@@ -30,5 +30,5 @@ class Responses:
     LOGIN_OK = "account logged in successfully"
 
     """Error messages."""
-    CREATE_ERROR = "error during account creation"
+    SIGN_UP_ERROR = "error during account creation"
     LOGIN_ERROR = "error during account login"

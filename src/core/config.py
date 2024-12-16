@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings
 
 
 class Config(BaseSettings):
+    PASSWORD_SALT: str = Field(..., env="PASSWORD_SALT")
     JWT_TOKEN_SECRET: str = Field(..., env="JWT_TOKEN_SECRET")
 
     POSTGRES_HOST: str = Field("localhost", env="POSTGRES_HOST")
@@ -19,6 +20,9 @@ class Config(BaseSettings):
 
     def get_public_key_path(self):
         return f"{self.RSA_KEYS_DIR}/public.pem"
+
+    def get_private_key_path(self):
+        return f"{self.RSA_KEYS_DIR}/private.pem"
 
     class Config:
         env_file = ".env"
