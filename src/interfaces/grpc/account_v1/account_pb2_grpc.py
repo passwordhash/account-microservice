@@ -3,8 +3,8 @@
 import grpc
 import warnings
 
-from . import account_pb2 as account__pb2
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
+from src.interfaces.grpc.account_v1 import account_pb2 as src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2
 
 GRPC_GENERATED_VERSION = '1.68.0'
 GRPC_VERSION = grpc.__version__
@@ -19,7 +19,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in account_pb2_grpc.py depends on'
+        + f' but the generated code in src/interfaces/grpc/account_v1/account_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -36,34 +36,34 @@ class AccountServiceStub(object):
             channel: A grpc.Channel.
         """
         self.Signup = channel.unary_unary(
-                '/account_v1.AccountService/Signup',
-                request_serializer=account__pb2.CreateRequest.SerializeToString,
-                response_deserializer=account__pb2.CreateResponse.FromString,
+                '/src.interfaces.grpc.account_v1.AccountService/Signup',
+                request_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.CreateRequest.SerializeToString,
+                response_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.CreateResponse.FromString,
                 _registered_method=True)
         self.Login = channel.unary_unary(
-                '/account_v1.AccountService/Login',
-                request_serializer=account__pb2.LoginRequest.SerializeToString,
-                response_deserializer=account__pb2.LoginResponse.FromString,
+                '/src.interfaces.grpc.account_v1.AccountService/Login',
+                request_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.LoginRequest.SerializeToString,
+                response_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.LoginResponse.FromString,
                 _registered_method=True)
         self.VerifyToken = channel.unary_unary(
-                '/account_v1.AccountService/VerifyToken',
-                request_serializer=account__pb2.VerifyTokenRequest.SerializeToString,
-                response_deserializer=account__pb2.VerifyTokenResponse.FromString,
+                '/src.interfaces.grpc.account_v1.AccountService/VerifyToken',
+                request_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.VerifyTokenRequest.SerializeToString,
+                response_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.VerifyTokenResponse.FromString,
                 _registered_method=True)
         self.GetPublicKey = channel.unary_unary(
-                '/account_v1.AccountService/GetPublicKey',
+                '/src.interfaces.grpc.account_v1.AccountService/GetPublicKey',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=account__pb2.GetPublicKeyResponse.FromString,
+                response_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetPublicKeyResponse.FromString,
                 _registered_method=True)
         self.Get = channel.unary_unary(
-                '/account_v1.AccountService/Get',
-                request_serializer=account__pb2.GetByIdRequest.SerializeToString,
-                response_deserializer=account__pb2.GetResponse.FromString,
+                '/src.interfaces.grpc.account_v1.AccountService/Get',
+                request_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetByIdRequest.SerializeToString,
+                response_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetResponse.FromString,
                 _registered_method=True)
         self.GetAll = channel.unary_unary(
-                '/account_v1.AccountService/GetAll',
+                '/src.interfaces.grpc.account_v1.AccountService/GetAll',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=account__pb2.GetAllResponse.FromString,
+                response_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetAllResponse.FromString,
                 _registered_method=True)
 
 
@@ -111,39 +111,39 @@ def add_AccountServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Signup': grpc.unary_unary_rpc_method_handler(
                     servicer.Signup,
-                    request_deserializer=account__pb2.CreateRequest.FromString,
-                    response_serializer=account__pb2.CreateResponse.SerializeToString,
+                    request_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.CreateRequest.FromString,
+                    response_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.CreateResponse.SerializeToString,
             ),
             'Login': grpc.unary_unary_rpc_method_handler(
                     servicer.Login,
-                    request_deserializer=account__pb2.LoginRequest.FromString,
-                    response_serializer=account__pb2.LoginResponse.SerializeToString,
+                    request_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.LoginRequest.FromString,
+                    response_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.LoginResponse.SerializeToString,
             ),
             'VerifyToken': grpc.unary_unary_rpc_method_handler(
                     servicer.VerifyToken,
-                    request_deserializer=account__pb2.VerifyTokenRequest.FromString,
-                    response_serializer=account__pb2.VerifyTokenResponse.SerializeToString,
+                    request_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.VerifyTokenRequest.FromString,
+                    response_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.VerifyTokenResponse.SerializeToString,
             ),
             'GetPublicKey': grpc.unary_unary_rpc_method_handler(
                     servicer.GetPublicKey,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=account__pb2.GetPublicKeyResponse.SerializeToString,
+                    response_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetPublicKeyResponse.SerializeToString,
             ),
             'Get': grpc.unary_unary_rpc_method_handler(
                     servicer.Get,
-                    request_deserializer=account__pb2.GetByIdRequest.FromString,
-                    response_serializer=account__pb2.GetResponse.SerializeToString,
+                    request_deserializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetByIdRequest.FromString,
+                    response_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetResponse.SerializeToString,
             ),
             'GetAll': grpc.unary_unary_rpc_method_handler(
                     servicer.GetAll,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=account__pb2.GetAllResponse.SerializeToString,
+                    response_serializer=src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetAllResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'account_v1.AccountService', rpc_method_handlers)
+            'src.interfaces.grpc.account_v1.AccountService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('account_v1.AccountService', rpc_method_handlers)
+    server.add_registered_method_handlers('src.interfaces.grpc.account_v1.AccountService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -164,9 +164,9 @@ class AccountService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/account_v1.AccountService/Signup',
-            account__pb2.CreateRequest.SerializeToString,
-            account__pb2.CreateResponse.FromString,
+            '/src.interfaces.grpc.account_v1.AccountService/Signup',
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.CreateRequest.SerializeToString,
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.CreateResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -191,9 +191,9 @@ class AccountService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/account_v1.AccountService/Login',
-            account__pb2.LoginRequest.SerializeToString,
-            account__pb2.LoginResponse.FromString,
+            '/src.interfaces.grpc.account_v1.AccountService/Login',
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.LoginRequest.SerializeToString,
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.LoginResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -218,9 +218,9 @@ class AccountService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/account_v1.AccountService/VerifyToken',
-            account__pb2.VerifyTokenRequest.SerializeToString,
-            account__pb2.VerifyTokenResponse.FromString,
+            '/src.interfaces.grpc.account_v1.AccountService/VerifyToken',
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.VerifyTokenRequest.SerializeToString,
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.VerifyTokenResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -245,9 +245,9 @@ class AccountService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/account_v1.AccountService/GetPublicKey',
+            '/src.interfaces.grpc.account_v1.AccountService/GetPublicKey',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            account__pb2.GetPublicKeyResponse.FromString,
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetPublicKeyResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -272,9 +272,9 @@ class AccountService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/account_v1.AccountService/Get',
-            account__pb2.GetByIdRequest.SerializeToString,
-            account__pb2.GetResponse.FromString,
+            '/src.interfaces.grpc.account_v1.AccountService/Get',
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetByIdRequest.SerializeToString,
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -299,9 +299,9 @@ class AccountService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/account_v1.AccountService/GetAll',
+            '/src.interfaces.grpc.account_v1.AccountService/GetAll',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            account__pb2.GetAllResponse.FromString,
+            src_dot_interfaces_dot_grpc_dot_account__v1_dot_account__pb2.GetAllResponse.FromString,
             options,
             channel_credentials,
             insecure,
