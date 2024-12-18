@@ -45,6 +45,11 @@ class AccountServiceStub(object):
                 request_serializer=account__pb2.LoginRequest.SerializeToString,
                 response_deserializer=account__pb2.LoginResponse.FromString,
                 _registered_method=True)
+        self.VerifyToken = channel.unary_unary(
+                '/account_v1.AccountService/VerifyToken',
+                request_serializer=account__pb2.VerifyTokenRequest.SerializeToString,
+                response_deserializer=account__pb2.VerifyTokenResponse.FromString,
+                _registered_method=True)
         self.GetPublicKey = channel.unary_unary(
                 '/account_v1.AccountService/GetPublicKey',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
@@ -72,6 +77,12 @@ class AccountServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def Login(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def VerifyToken(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -107,6 +118,11 @@ def add_AccountServiceServicer_to_server(servicer, server):
                     servicer.Login,
                     request_deserializer=account__pb2.LoginRequest.FromString,
                     response_serializer=account__pb2.LoginResponse.SerializeToString,
+            ),
+            'VerifyToken': grpc.unary_unary_rpc_method_handler(
+                    servicer.VerifyToken,
+                    request_deserializer=account__pb2.VerifyTokenRequest.FromString,
+                    response_serializer=account__pb2.VerifyTokenResponse.SerializeToString,
             ),
             'GetPublicKey': grpc.unary_unary_rpc_method_handler(
                     servicer.GetPublicKey,
@@ -178,6 +194,33 @@ class AccountService(object):
             '/account_v1.AccountService/Login',
             account__pb2.LoginRequest.SerializeToString,
             account__pb2.LoginResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def VerifyToken(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/account_v1.AccountService/VerifyToken',
+            account__pb2.VerifyTokenRequest.SerializeToString,
+            account__pb2.VerifyTokenResponse.FromString,
             options,
             channel_credentials,
             insecure,

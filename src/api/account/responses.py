@@ -24,11 +24,15 @@ class Responses:
     """Input validation messages."""
     EMAIL_REQUIRED = "email is required"
     PASSWORD_REQUIRED = "encrypted_password is required"
+    TOKEN_REQUIRED = "jwt_token is required"
 
     """Success messages."""
     CREATE_OK = "account created successfully"
     LOGIN_OK = "account logged in successfully"
+    VERIFY_TOKEN_OK = "token verified successfully"
 
     """Error messages."""
     SIGN_UP_ERROR = "error during account creation"
     LOGIN_ERROR = "error during account login"
+    TOKEN_EXPIRED = "jwt token expired"
+    INVALID_TOKEN = "invalid"

@@ -76,6 +76,16 @@ class AccountUseCase:
         except Exception as e:
             raise AccountError("Error while logging in.") from e
 
+    def verify_token(self, token: str) -> str:
+        """Проверка JWT токена. Возвращает UUID."""
+        try:
+            uuid = self._decode_jwt_token(token)
+            return uuid
+        except (TokenExpiredError, InvalidTokenError) as e:
+            raise e
+        except Exception as e:
+            raise AccountError("Error while verifying token.") from e
+
     @staticmethod
     def get_public_key() -> str:
         """Возвращает публичный ключ RSA ключ."""

@@ -11,7 +11,7 @@ from src.infrastructure.database import SessionLocal
 from src.interfaces.grpc import account_pb2 as pb, account_pb2_grpc as grpc
 from src.use_cases.account.use_case import AccountUseCase
 from src.use_cases.exceptions import EmailConflictError, AccountNotFoundError, \
-    InvalidPasswordError
+    InvalidPasswordError, TokenExpiredError, InvalidTokenError
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +78,32 @@ class AccountService(grpc.AccountServiceServicer):
         except Exception as e:
             handle_error(context, e, Responses.LOGIN_ERROR)
             return pb.LoginResponse()
+
+    def VerifyToken(self, request, context):
+        try:
+            if request.jwt_token == "":
+                response(context, grpc_mod.StatusCode.INVALID_ARGUMENT,
+                         Responses.TOKEN_REQUIRED)
+                return pb.VerifyTokenResponse()
+
+            uuid = self.account_use_case.verify_token(request.jwt_token)
+
+            logger.info(f"Token verified for account: {uuid}")
+            response(context, grpc_mod.StatusCode.OK, Responses.VERIFY_TOKEN_OK)
+            return pb.VerifyTokenResponse(uuid=uuid)
+        except TokenExpiredError as e:
+            logger.warning(f"Token expired: {str(e)}")
+            response(context, grpc_mod.StatusCode.UNAUTHENTICATED,
+                     Responses.TOKEN_EXPIRED)
+            return pb.VerifyTokenResponse()
+        except InvalidTokenError as e:
+            logger.warning(f"Invalid token: {str(e)}")
+            response(context, grpc_mod.StatusCode.UNAUTHENTICATED,
+                     Responses.INVALID_TOKEN)
+            return pb.VerifyTokenResponse
+        except Exception as e:
+            handle_error(context, e)
+            return pb.VerifyTokenResponse()
 
     def GetPublicKey(self, request, context):
         try:
