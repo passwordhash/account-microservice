@@ -1,11 +1,12 @@
-include .env
+ifneq ("$(wildcard .env)", "")
+    include .env
+    export $(shell sed 's/=.*//' .env)
+endif
 
 RSA_KEYS_DIR ?= ./keys
 PROTO_DIR = ./proto/account_v1
 OUT_DIR = ./src/interfaces/grpc
 PROTOC = python3 -m grpc_tools.protoc
-
-#export PYTHONPATH := ./src/interfaces/grpc:$(PYTHONPATH)
 
 all: generate-keys generate-proto
 
@@ -23,7 +24,6 @@ generate-proto:
 		--grpc_python_out=./ \
 		 $(PROTO_DIR)/*.proto
 	@echo "Code generated in $(OUT_DIR)"
-
 
 clean:
 	@echo "Cleaning generated files..."
