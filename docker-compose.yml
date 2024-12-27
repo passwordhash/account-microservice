@@ -4,20 +4,20 @@ networks:
     account-microservice:
 
 services:
-    app:
-        build: .
-        container_name: account-service
-        restart: always
-        ports:
-            - "50051:50051"
-        env_file:
-            - .env
-        networks:
-            - account-microservice
-        depends_on:
-            - db
+#    app:
+#        build: .
+#        container_name: account-service
+#        restart: always
+#        ports:
+#            - "50051:50051"
+#        env_file:
+#            - .env
+#        networks:
+#            - account-microservice
+#        depends_on:
+#            - db
 
-    db:
+    db-account-service:
         image: postgres:15
         container_name: db-account-service
         restart: always

@@ -12,7 +12,7 @@ class Config(BaseSettings):
     POSTGRES_USER: str = Field("postgres", env="POSTGRES_USER")
     POSTGRES_PASSWORD: str = Field("postgres", env="POSTGRES_PASSWORD")
 
-    RSA_KEYS_DIR: str = Field("keys", env="RSA_KEYS_DIR")
+    RSA_KEYS_DIR: str = Field("./keys", env="RSA_KEYS_DIR", required=False)
 
     def get_postgres_db_url(self):
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}" \
