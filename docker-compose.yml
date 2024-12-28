@@ -1,0 +1,38 @@
+version: '3.9'
+
+networks:
+    account-microservice:
+
+services:
+#    app:
+#        build: .
+#        container_name: account-service
+#        restart: always
+#        ports:
+#            - "50051:50051"
+#        env_file:
+#            - .env
+#        networks:
+#            - account-microservice
+#        depends_on:
+#            - db
+
+    db-account-service:
+        image: postgres:15
+        container_name: db-account-service
+        restart: always
+        ports:
+            - "${POSTGRES_PORT}:5432"
+        env_file:
+            -   .env
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        networks:
+            - account-microservice
+        volumes:
+            - db_data:/var/lib/postgresql/data
+
+volumes:
+    db_data:

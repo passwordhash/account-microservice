@@ -1,4 +1,8 @@
+import logging
+
 import grpc as grpc_mod
+
+logger = logging.getLogger(__name__)
 
 
 def response(context, code: grpc_mod.StatusCode, message: str):
@@ -6,11 +10,12 @@ def response(context, code: grpc_mod.StatusCode, message: str):
     context.set_details(message)
 
 
-def handle_error(context, error, default_message="An error occurred"):
+def handle_error(context, error: Exception, message="An error occurred"):
+    logger.error(f"{message}: {str(error.__context__)}")
     if isinstance(error, grpc_mod.RpcError):
         response(context, error.code(), error.details())
     else:
-        response(context, grpc_mod.StatusCode.INTERNAL, default_message)
+        response(context, grpc_mod.StatusCode.INTERNAL, message)
 
 
 class Responses:
@@ -19,11 +24,15 @@ class Responses:
     """Input validation messages."""
     EMAIL_REQUIRED = "email is required"
     PASSWORD_REQUIRED = "encrypted_password is required"
+    TOKEN_REQUIRED = "jwt_token is required"
 
     """Success messages."""
     CREATE_OK = "account created successfully"
     LOGIN_OK = "account logged in successfully"
+    VERIFY_TOKEN_OK = "token verified successfully"
 
     """Error messages."""
-    CREATE_ERROR = "error during account creation"
+    SIGN_UP_ERROR = "error during account creation"
     LOGIN_ERROR = "error during account login"
+    TOKEN_EXPIRED = "jwt token expired"
+    INVALID_TOKEN = "invalid"

@@ -15,7 +15,7 @@ class Account:
 @dataclass
 class AccountCreate:
     email: str
-    password: str
+    encrypted_password: str
 
 
 @dataclass

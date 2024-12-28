@@ -3,12 +3,9 @@ import logging
 from sqlalchemy import create_engine, Engine, text
 from sqlalchemy.orm import sessionmaker
 
-from src.core.config import Config
+from src.core.config import config
 
-DEFAULT_POSTGRES_DATABASE_URL = ("postgresql://postgres:password@localhost:5432"
-                                 "/account-service")
-
-engine = create_engine(Config.POSTGRES_DB_URL.value)
+engine = create_engine(config.get_postgres_db_url())
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

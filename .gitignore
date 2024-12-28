@@ -1,4 +1,6 @@
-proto/.git
+proto/
+keys/*
+*pem
 
 .idea/
 .vscode/
@@ -15,6 +17,7 @@ bin/
 build/
 dist/
 
+.venv/
 *.log
 *.env
 *.env.*
@@ -27,6 +30,7 @@ vendor/
 *.pb.gw.go
 **/__pychache__/
 */__pychache__/
+__pycache__/
 
 .DS_Store
 Thumbs.db

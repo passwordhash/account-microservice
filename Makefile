@@ -1,24 +1,31 @@
+ifneq ("$(wildcard .env)", "")
+    include .env
+    export $(shell sed 's/=.*//' .env)
+endif
+
+RSA_KEYS_DIR ?= ./keys
 PROTO_DIR = ./proto/account_v1
 OUT_DIR = ./src/interfaces/grpc
 PROTOC = python3 -m grpc_tools.protoc
 
-all: generate
+all: generate-keys generate-proto
 
-generate:
+generate-keys:
+	@echo "Generating RSA keys..."
+	@mkdir -p $(RSA_KEYS_DIR)
+	@openssl genrsa -out $(RSA_KEYS_DIR)/private.pem 2048
+	@openssl rsa -in $(RSA_KEYS_DIR)/private.pem -pubout -out $(RSA_KEYS_DIR)/public.pem
+
+generate-proto:
 	@echo "Generating gRPC and Protobuf code..."
 	@mkdir -p $(OUT_DIR)
-	$(PROTOC) -I=$(PROTO_DIR) --python_out=$(OUT_DIR) --grpc_python_out=$(OUT_DIR) $(PROTO_DIR)/*.proto
+	$(PROTOC) -Isrc/interfaces/grpc=proto \
+		--python_out=./ \
+		--grpc_python_out=./ \
+		 $(PROTO_DIR)/*.proto
 	@echo "Code generated in $(OUT_DIR)"
 
 clean:
 	@echo "Cleaning generated files..."
 	@rm -rf $(OUT_DIR)
 	@echo "Cleaned $(OUT_DIR)"
-
-create-db:
-	docker run --name account-service-db \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=password \
-  -e POSTGRES_DB=account-service \
-  -p 5432:5432 \
-  -d postgres
