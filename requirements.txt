@@ -17,3 +17,4 @@ six==1.17.0
 soupsieve==2.6
 SQLAlchemy==2.0.36
 typing_extensions==4.12.2
+grpcio-reflection==1.68.1
