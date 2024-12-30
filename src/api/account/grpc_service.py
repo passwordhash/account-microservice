@@ -50,6 +50,7 @@ class AccountService(grpc.AccountServiceServicer):
             response(context, grpc_mod.StatusCode.ALREADY_EXISTS, str(e))
             return pb.CreateResponse()
         except Exception as e:
+            print("asfasfasfasdfa fasdfasdf")
             handle_error(context, e, Responses.SIGN_UP_ERROR)
             return pb.CreateResponse()
 
@@ -102,6 +103,10 @@ class AccountService(grpc.AccountServiceServicer):
             response(context, grpc_mod.StatusCode.UNAUTHENTICATED,
                      Responses.INVALID_TOKEN)
             return pb.VerifyTokenResponse
+        except AccountNotFoundError as e:
+            logger.warning(f"Account not found: {str(e)}")
+            response(context, grpc_mod.StatusCode.NOT_FOUND, str(e))
+            return pb.VerifyTokenResponse()
         except Exception as e:
             handle_error(context, e)
             return pb.VerifyTokenResponse()

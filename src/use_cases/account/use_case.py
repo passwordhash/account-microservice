@@ -77,9 +77,12 @@ class AccountUseCase:
             raise AccountError("Error while logging in.") from e
 
     def verify_token(self, token: str) -> str:
-        """Проверка JWT токена. Возвращает UUID."""
+        """Проверка JWT токена и пользователя. Возвращает UUID."""
         try:
             uuid = self._decode_jwt_token(token)
+            user = self.account_repository.find_by_uuid(uuid)
+            if not user:
+                raise AccountNotFoundError("Account not found.")
             return uuid
         except (TokenExpiredError, InvalidTokenError) as e:
             raise e
