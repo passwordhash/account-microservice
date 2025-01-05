@@ -1,6 +1,8 @@
 proto/
 keys/*
 *pem
+**/*pb2*.py
+src/interfaces/grpc/
 
 .idea/
 .vscode/

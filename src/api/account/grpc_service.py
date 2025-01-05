@@ -1,5 +1,7 @@
 import logging
 
+import google
+from google.protobuf.empty_pb2 import Empty
 import grpc as grpc_mod
 
 from src.api.account.responses import Responses, response, handle_error
@@ -50,6 +52,7 @@ class AccountService(grpc.AccountServiceServicer):
             response(context, grpc_mod.StatusCode.ALREADY_EXISTS, str(e))
             return pb.CreateResponse()
         except Exception as e:
+            print("asfasfasfasdfa fasdfasdf")
             handle_error(context, e, Responses.SIGN_UP_ERROR)
             return pb.CreateResponse()
 
@@ -102,6 +105,10 @@ class AccountService(grpc.AccountServiceServicer):
             response(context, grpc_mod.StatusCode.UNAUTHENTICATED,
                      Responses.INVALID_TOKEN)
             return pb.VerifyTokenResponse
+        except AccountNotFoundError as e:
+            logger.warning(f"Account not found: {str(e)}")
+            response(context, grpc_mod.StatusCode.NOT_FOUND, str(e))
+            return pb.VerifyTokenResponse()
         except Exception as e:
             handle_error(context, e)
             return pb.VerifyTokenResponse()
@@ -124,3 +131,7 @@ class AccountService(grpc.AccountServiceServicer):
 
     def Get(self, request, context):
         pass
+
+    def HealthCheck(self, request, context):
+        response(context, grpc_mod.StatusCode.OK, Responses.HEALTH_CHECK_OK)
+        return google.protobuf.empty_pb2.Empty()
