@@ -30,6 +30,7 @@ class Responses:
     CREATE_OK = "account created successfully"
     LOGIN_OK = "account logged in successfully"
     VERIFY_TOKEN_OK = "token verified successfully"
+    HEALTH_CHECK_OK = "account service is healthy"
 
     """Error messages."""
     SIGN_UP_ERROR = "error during account creation"

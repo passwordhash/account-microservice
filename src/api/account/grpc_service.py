@@ -1,5 +1,7 @@
 import logging
 
+import google
+from google.protobuf.empty_pb2 import Empty
 import grpc as grpc_mod
 
 from src.api.account.responses import Responses, response, handle_error
@@ -129,3 +131,7 @@ class AccountService(grpc.AccountServiceServicer):
 
     def Get(self, request, context):
         pass
+
+    def HealthCheck(self, request, context):
+        response(context, grpc_mod.StatusCode.OK, Responses.HEALTH_CHECK_OK)
+        return google.protobuf.empty_pb2.Empty()
